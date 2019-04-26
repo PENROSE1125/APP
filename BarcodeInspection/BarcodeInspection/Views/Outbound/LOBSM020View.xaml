@@ -1,0 +1,158 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+			 x:Class="BarcodeInspection.Views.Outbound.LOBSM020View"
+			 xmlns:behaviors="clr-namespace:BarcodeInspection.Behaviors"
+			 xmlns:dxGrid="clr-namespace:DevExpress.Mobile.DataGrid;assembly=DevExpress.Mobile.Grid.v18.2"
+			 xmlns:ios="clr-namespace:Xamarin.Forms.PlatformConfiguration.iOSSpecific;assembly=Xamarin.Forms.Core"
+			 xmlns:vm="clr-namespace:BarcodeInspection.ViewModels.Outbound"
+			 ios:Page.UseSafeArea="True"
+			 Title="피킹상세">
+
+	<ContentPage.BindingContext>
+		<vm:LOBSM020ViewModel/>
+	</ContentPage.BindingContext>
+	
+	<ContentPage.Content>
+		<Grid>
+			<Grid.RowDefinitions>
+				<RowDefinition Height="50"/>
+				<!-- 출고요청일 -->
+				<RowDefinition Height="50"/>
+				<!-- 온도, 라벨 -->
+				<RowDefinition Height="50"/>
+				<!--배송군-->
+				<RowDefinition Height="*"/>
+				<!--목록-->
+				<RowDefinition Height="50"/>
+				<!--완료여부-->
+				<RowDefinition Height="50"/>
+				<!--버튼-->
+
+			</Grid.RowDefinitions>
+
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition Width="100"/>
+				<ColumnDefinition Width="70"/>
+				<ColumnDefinition Width="50"/>
+				<ColumnDefinition Width="*"/>
+
+			</Grid.ColumnDefinitions>
+
+			<Label Grid.Row="0" Grid.Column="0" Text="출고요청일"  HorizontalTextAlignment="End" VerticalTextAlignment="Center"/>
+
+			<DatePicker x:Name ="RqshpdDate" 
+						Date="{Binding RqshpdDate}"
+						Grid.Row="0"
+						Grid.Column="1"
+						Grid.ColumnSpan="3"
+						VerticalOptions="CenterAndExpand" 
+						Format="yyyy-MM-dd">
+				<DatePicker.Behaviors>
+					<behaviors:EventToCommandBehavior
+									EventName="DateSelected"
+									Command="{Binding DateSelectedCommand}"/>
+				</DatePicker.Behaviors>
+			</DatePicker>
+			<Label Grid.Row="1" Grid.Column="0" Text="온도"  HorizontalTextAlignment="End" VerticalTextAlignment="Center"/>
+			<Entry Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="1" Text="0-전체"/>
+			<Label Grid.Row="1" Grid.Column="2" Text="라벨 : "  HorizontalTextAlignment="End" VerticalTextAlignment="Center"  />
+			<Label Grid.Row="1" Grid.Column="3" Text="193"  HorizontalTextAlignment="End" VerticalTextAlignment="Center"/>
+			<Label Grid.Row="2" Grid.Column="0" Text="배송군" HorizontalTextAlignment="End" />
+			<Entry Grid.Row="2" Grid.Column="1" Text="E01"/>
+			<Image x:Name="imgScanNew" Grid.Row="2" Grid.Column="2" IsEnabled="{Binding IsEnabled}" IsVisible="{Binding IsEnabled}"
+				   Source="Images/barcodeRect36x36.png" Aspect="AspectFit">
+				<Image.GestureRecognizers>
+                    <!--   <tapgesturerecognizer tapped="imgscannewtapped" /> -->
+                    <TapGestureRecognizer Command="{Binding BarcodeScanCommand}" />
+				</Image.GestureRecognizers>
+			</Image>
+			<Entry Grid.Row="2" Grid.Column="3" Text="E01"/>
+
+			<!--ColumnsAutoWidth="False"  가로 스크롤 사용하려면 False-->
+			<dxGrid:GridControl x:Name="grid" 
+								Grid.Row="3" 
+								Grid.ColumnSpan="4"
+								ItemsSource="{Binding SearchResult}"  
+								SortMode="Single" 
+								RowHeight="50"
+								ColumnsAutoWidth="False" 
+								ColumnHeadersHeight="40"
+								AllowEditRows="False"
+								AllowDeleteRows="False"
+								AllowGroup="False"
+								AllowGroupCollapse="False"
+								AllowResizeColumns="True"
+								AllowSort="True"
+								IsRowCellMenuEnabled ="False"
+								AllowHorizontalScrollingVirtualization="False"
+								AutoGenerateColumnsMode="None"
+								IsColumnChooserEnabled="False"
+								IsColumnMenuEnabled="False"
+								IsPullToRefreshEnabled="True"
+								PullToRefreshCommand="">
+				<dxGrid:GridControl.Columns>
+
+					<!--<dxGrid:TextColumn Caption="구매No" FieldName="Sebeln" Width="90" ContentAlignment="Start" IsReadOnly="True" MinWidth="90" /> -->
+					<!-- FixedStyle="Left" -->
+					<dxGrid:TextColumn Caption="매출처" FieldName="Compky" Width="85" ContentAlignment="Center" IsReadOnly="True"/>
+					<dxGrid:TextColumn Caption="매출처명" FieldName="Dlvynm" Width="90" ContentAlignment="Start" IsReadOnly="True" />
+					<dxGrid:TextColumn Caption="온도" FieldName="Wareky" Width="80" ContentAlignment="Start" IsReadOnly="True" />
+					<dxGrid:TextColumn Caption="라벨개수" FieldName="Wareky" Width="80" ContentAlignment="Start" IsReadOnly="True" />
+				</dxGrid:GridControl.Columns>
+
+				<dxGrid:GridControl.Behaviors>
+					<behaviors:EventToCommandBehavior
+							EventName="RowTap"
+							Command="{Binding GridRowTapCommand}"
+							CommandParameter="{Binding DevExpress.Mobile.DataGrid.RowTapEventArgs}"/>
+				</dxGrid:GridControl.Behaviors>
+
+
+			</dxGrid:GridControl>
+
+
+
+
+			<Switch Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4"
+					x:Name="SwitchTran"
+					IsEnabled="{Binding IsEnabled}"
+					IsVisible="{Binding IsEnabled}"
+					IsToggled ="{Binding IsTranToggle}" 
+					HorizontalOptions="Center" 
+					VerticalOptions="Center">
+				<Switch.Behaviors>
+					<behaviors:EventToCommandBehavior
+							EventName="Toggled"
+							Command="{Binding SwitchToggledCommand}"
+							CommandParameter="{Binding ToggledEventArgs}"/>
+				</Switch.Behaviors>
+			</Switch>
+
+			<Button Text="초기화"
+					x:Name="btnClear"
+					Grid.Row="5"
+					Grid.Column="0"
+					IsEnabled="{Binding IsEnabled}"
+					Command="{Binding SearchCommand}"
+					>
+			</Button>
+			<Button Text="상세"
+					x:Name="btnSearchDetail"
+					Grid.Row="5"
+					Grid.Column="1"
+					IsEnabled="{Binding IsEnabled}"
+					Command="{Binding SearchCommand}"
+					>
+			</Button>
+			<Button Text="전체스캔"
+					x:Name="btnScanAll"
+					Grid.Row="5"
+					Grid.Column="2"
+					IsEnabled="{Binding IsEnabled}"
+					Command="{Binding SearchCommand}"
+					>
+			</Button>
+		</Grid>
+	</ContentPage.Content>
+</ContentPage>
